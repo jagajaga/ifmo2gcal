@@ -1,4 +1,4 @@
-{ cabal, httpConduit, aeson, base16Bytestring, xmlConduit, htmlConduit, text }:
+{ cabal, httpConduit, aeson, base16Bytestring, xmlConduit, htmlConduit, text, hoauth2, httpTypes }:
 
 cabal.mkDerivation (self: {
   pname = "ifmo2gcal";
@@ -7,6 +7,6 @@ cabal.mkDerivation (self: {
   isLibrary = false;
   isExecutable = true;
   buildDepends = [
-    aeson httpConduit base16Bytestring xmlConduit htmlConduit text 
+    aeson httpConduit base16Bytestring xmlConduit htmlConduit text hoauth2 httpTypes
   ];
 })
