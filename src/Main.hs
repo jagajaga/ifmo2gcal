@@ -35,9 +35,13 @@ import           Data.Time.Calendar.WeekDate
 
 main :: IO ()
 main = do
+    args <- getArgs
+    let group = case args of 
+                [a] ->a
+                _ -> "3538"
     (ifmoCal, token) <- doGetInfo
     let (Just calendarId) = Types.id ifmoCal
-    schedule <- getSchedule
+    schedule <- getSchedule group
     date <- getCurrentTime >>= return . utctDay
     let (year, month, day') = toGregorian date
     let (curWeek, day) = (\(_, a, c) -> (a, day' - (c - 1))) $ toWeekDate date
@@ -53,11 +57,11 @@ getRequest year month day' curWeek dayOfTheWeek startT endT interval' location n
                   interval = show $ if  interval' == "\160" then 1 else 2
                   result = encodeUtf8 ( pack "{\n \"end\": {\n  \"dateTime\": \"" `append` (pack $ show year) `append` pack "-" `append` (pack $ show month) `append` pack "-" `append` pack day `append` pack "T" `append` endT `append` pack ":00\",\n  \"timeZone\": \"Europe/Moscow\"\n },\n \"start\": {\n  \"dateTime\": \""`append` (pack $ show year) `append` pack "-" `append` (pack $ show month) `append` pack "-" `append` pack day `append` pack "T" `append` startT `append` pack ":00\",\n  \"timeZone\": \"Europe/Moscow\"\n },\n \"recurrence\": [\n  \"RRULE:FREQ=WEEKLY;INTERVAL=" `append` pack interval `append` pack ";WKST=SU;UNTIL=20140627T000000Z\"\n ],\n \"location\": \"" `append` location `append` pack "\",\n \"organizer\": {\n  \"displayName\": \"" `append` orginizer `append` pack "\"\n },\n \"summary\": \"" `append` name `append` pack "\"\n}" )
 
-getSchedule = do
+getSchedule group = do
     initReq <- parseUrl "http://www.ifmo.ru/module/isu_schedule.php"
     let req' = initReq
     let req = (flip urlEncodedBody) req' $
-                [ ("group", "3538"),
+                [ ("group", BS.pack group),
                 ("week", "0") ]
     response <- withManager $ httpLbs req
     let page = responseBody response
