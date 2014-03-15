@@ -1,3 +1,3 @@
 [submodule "hoauth2"]
 	path = hoauth2
-	url = ./hoauth2
+	url = git://github.com/jagajaga/hoauth2.git
